@@ -32,7 +32,7 @@ services:
   we_plant_pgadmin:
     image: dpage/pgadmin4
     environment:
-      - PGADMIN_DEFAULT_EMAIL=davide9935@gmail.com
+      - PGADMIN_DEFAULT_EMAIL=email
       - PGADMIN_DEFAULT_PASSWORD=password
     tty: true
     links:
