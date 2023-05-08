@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  we_plant_api:
+    platform: linux/amd64 # specify the architecture here
+    depends_on:
+      - we_plant_db
+    container_name: we_plant_api
+    restart: always
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+        - "9000:9000"
+        - "3001:3001"
+        - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://we_plant_db:5432/weplant
+      - SPRING_DATASOURCE_USERNAME=we-plant
+      - SPRING_DATASOURCE_PASSWORD=password
+    tty: true
+    volumes:
+      - ../:/we-plant-api:delegated
+  we_plant_db:
+    platform: linux/amd64 # specify the architecture here
+    build:
+      context: postgres
+      dockerfile: Dockerfile.dev
+    container_name: we_plant_db
+    user: postgres
+    ports:
+      - "5432:5432"
+  we_plant_pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=davide9935@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    tty: true
+    links:
+      - we_plant_db
+    ports:
+      - "9999:80"
+  
