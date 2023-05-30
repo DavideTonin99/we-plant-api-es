@@ -18,7 +18,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=password
     tty: true
     volumes:
-      - ../we-plant-api-es/:/we-plant-api:delegated
+      - ../we-plant-api/:/we-plant-api:delegated
       # - map cartella app
       # - map cartella per configurazione apache
   we_plant_db:
