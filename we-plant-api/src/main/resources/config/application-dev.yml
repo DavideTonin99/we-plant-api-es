@@ -1,5 +1,5 @@
 # ===================================================================
-# Spring Boot configuration for the "prod" profile.
+# Spring Boot configuration for the "dev" profile.
 #
 # This configuration overrides the application.yml file.
 #
@@ -15,33 +15,38 @@
 
 logging:
     level:
-        ROOT: INFO
-        cloud.nino.nino: INFO
-        io.github.jhipster: INFO
+        ROOT: DEBUG
+        io.github.jhipster: DEBUG
+        cloud.nino.nino: DEBUG
 
 spring:
+    profiles:
+        active: dev
+        include: swagger
     devtools:
         restart:
-            enabled: false
+            enabled: true
         livereload:
-            enabled: false
+            enabled: false # we use Webpack dev server + BrowserSync for livereload
+    jackson:
+        serialization.indent_output: true
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:postgresql://nino-postgresql:5432/we-plant
-        username: 
-        password: 
+        url: jdbc:postgresql://we_plant_db:5432/weplant
+        username: we-plant
+        password: password
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
-        show-sql: false
+        show-sql: true
         properties:
             hibernate.id.new_generator_mappings: true
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
-            hibernate.generate_statistics: false
+            hibernate.generate_statistics: true
             hibernate.cache.region.factory_class: io.github.jhipster.config.jcache.BeanClassLoaderAwareJCacheRegionFactory
     liquibase:
-        contexts: prod
+        contexts: dev
 #    data:
 #        mongodb:
 #            uri: mongodb://localhost:27017
@@ -50,15 +55,17 @@ spring:
         host: smtp.gmail.com
         port: 587
         username:
-        password: 
+        password:
         protocol: smtp
         tls: true
         properties.mail.smtp:
             auth: true
             starttls.enable: true
             ssl.trust: smtp.gmail.com
+    messages:
+        cache-duration: PT1S # 1 second, see the ISO 8601 standard
     thymeleaf:
-        cache: true
+        cache: false
 
 # ===================================================================
 # To enable SSL, generate a certificate using:
@@ -70,21 +77,15 @@ spring:
 # Then, modify the server.ssl properties so your "server" configuration looks like:
 #
 # server:
-#    port: 443
+#    port: 8443
 #    ssl:
 #        key-store: keystore.p12
 #        key-store-password: <your-password>
 #        key-store-type: PKCS12
 #        key-alias: nino
-#        # The ciphers suite enforce the security by deactivating some old and deprecated SSL cipher, this list was tested against SSL Labs (https://www.ssllabs.com/ssltest/)
-#        ciphers: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 ,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA,TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
 # ===================================================================
 server:
     port: 8080
-    compression:
-        enabled: true
-        mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
-        min-response-size: 1024
 
 # ===================================================================
 # JHipster specific properties
@@ -95,8 +96,10 @@ server:
 jhipster:
     http:
         version: V_1_1 # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
-        cache: # Used by the CachingHttpHeadersFilter
-            timeToLiveInDays: 1461
+    cache: # Cache configuration
+        ehcache: # Ehcache configuration
+            time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+            max-entries: 100 # Number of objects in each cache entry
     # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
     cors:
         allowed-origins: "*"
@@ -105,20 +108,16 @@ jhipster:
         exposed-headers: "Authorization,Link,X-Total-Count"
         allow-credentials: true
         max-age: 1800
-    cache: # Cache configuration
-        ehcache: # Ehcache configuration
-            time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
-            max-entries: 1000 # Number of objects in each cache entry
     security:
         authentication:
             jwt:
-                secret: a49b6a2ab6e1f73e1d3db8afab9896fd56636052
+                secret: my-secret-token-to-change-in-production
                 # Token is valid 24 hours
                 token-validity-in-seconds: 86400
                 token-validity-in-seconds-for-remember-me: 2592000
     mail: # specific JHipster mail property, for standard properties see MailProperties
         from: nino@localhost
-        base-url: https://api.ilmiocapitaleverde.nino.cloud # Modify according to your server's URL
+        base-url: http://192.168.1.149:8080
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx:
             enabled: true
@@ -141,15 +140,14 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
 application:
     service-config:
         jwt:
         end-point:
-        email-from: info@gojodigital.com
+        email-from: davide.tonin@studenti.univr.it
     email-config:
-        access-id: AKIAXBCJEMGR4U2YIJDG
-        secret-key: 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
+        access-id: 
+        secret-key:
 
 #=====================================================================#
 #=======================Elasticsearch=================================#
@@ -157,10 +155,9 @@ elasticsearch:
     host: localhost
     port: 9200
 
-
 # application:
 
 nino:
     images:
         location: /nino-images
-        thumbnail-size: 200
+        thumbnail-size: 150
