@@ -13,16 +13,11 @@ RUN npm install -y --global yarn
 
 RUN apt-get install -y build-essential
 
-RUN apt-get install apache2 -y
-RUN echo "Mutex posixsem" >> /etc/apache2/apache2.conf
-
-RUN a2enmod proxy_http
-RUN a2enmod rewrite
+# COMANDI PER INSTALLAZIONE E CONFIGURAZIONE APACHE
 
 WORKDIR /we-plant-api
 
-EXPOSE 80
-EXPOSE 443
 EXPOSE 8080
 EXPOSE 9000
 EXPOSE 3001
+# EXPOSE PORTE PER HTTP E HTTPS
