@@ -107,6 +107,21 @@ public class AlberoCustomService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    /**
+     * Get all the alberos sorted by last update.
+     *
+     * @param pageable
+     * @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<AlberoCustomDTO> findAllAlberosSorted(Pageable pageable) {
+        log.debug("Request to get all Alberos sorted by Last Update");
+        return alberoCustomRepository.findAllAlberosSortedByLastUpdate(pageable).stream()
+            .map(this::findAlbero)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+
 
     private AlberoCustomDTO findAlbero(Albero albero) {
         Optional<AlberoCustomDTO> alberoCustomDTO = alberoCustomRepository.findFirstByMainIdOrderByDataUltimoAggiornamentoDesc(albero.getMain().getId()).map(this::getAlberCustomDto);

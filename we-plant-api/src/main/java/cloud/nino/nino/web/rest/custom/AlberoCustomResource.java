@@ -96,7 +96,18 @@ public class AlberoCustomResource {
         log.debug("REST request to get all Alberos");
         return alberoCustomService.findAll(pageable);
     }
-
+    
+    /**
+     * GET  /alberos/sorted-by-last-update  get all the alberos.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of alberos in body
+     */
+    @GetMapping("/alberos/sorted-by-last-update")
+    @Timed
+    public List<AlberoCustomDTO> getAllAlberosSortedByLastUpdate(Pageable pageable) {
+        log.debug("REST request to get all Alberos sorted by last update");
+        return alberoCustomService.findAllAlberosSorted(pageable);
+    }
 
     /**
      * GET  /alberos/export-history/:mainId : get the "id" alberoVisit.
