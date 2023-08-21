@@ -1,6 +1,8 @@
 package cloud.nino.nino.repository.custom;
 
 import cloud.nino.nino.domain.Albero;
+import cloud.nino.nino.domain.User;
+import cloud.nino.nino.service.dto.UserDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,4 +52,7 @@ public interface AlberoCustomRepository extends JpaRepository<Albero, Long> {
 
     @Query(value = "SELECT id, entityid, id_pianta, codice_area, nome_comune, classe_altezza, altezza, diametro_fusto, diametro, wkt, aggiornamento, nota, tipo_di_suolo, data_impianto, data_abbattimento, ( SELECT max(b.data_ultimo_aggiornamento) AS data_ultimo_aggiornamento FROM Albero b WHERE b.main_id = a.main_id ), data_prima_rilevazione, note_tecniche, posizione, deleted, essenza_id, modificato_da_id, main_id FROM Albero a WHERE a.main_id = a.id ORDER BY a.data_ultimo_aggiornamento desc", nativeQuery = true)
     List<Albero> findAllAlberosSortedByLastUpdate(Pageable pageable);
+    
+    @Query(value = "SELECT distinct(u.id), u.login,u.password_hash, u.first_name, u.last_name, u.email,  u.activated, u.lang_key,u.image_url, u.activation_key,u.reset_key, u.reset_date FROM albero a JOIN jhi_user u on a.modificato_da_id = u.id  WHERE a.main_id = ?1", nativeQuery = true)
+    List<User> findAllUsersByIdPianta(Long idPianta);
 }
