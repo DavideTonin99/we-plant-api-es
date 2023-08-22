@@ -132,6 +132,17 @@ public class AlberoCustomService {
         }
 
     }
+    
+    /**
+     * Get total number of trees in DB.
+     *
+     * @param 
+     * @return number of trees.
+     */
+    public long getTotalNumberTrees() {
+    	long totalNumber = alberoCustomRepository.getTotalNumberTrees();
+        return totalNumber;
+    }
 
 
     /**

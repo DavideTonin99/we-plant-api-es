@@ -98,6 +98,18 @@ public class AlberoCustomResource {
     }
     
     /**
+     * GET  /alberos/total-number  get total number of trees in DB.
+     *
+     * @return the ResponseEntity with status 200 (OK) and a long representing the total number of trees
+     */
+    @GetMapping("/alberos/total-number")
+    @Timed
+    public long getTotalNumberOfTrees() {
+        log.debug("REST request to get total number of Alberos");
+        return alberoCustomService.getTotalNumberTrees();
+    }
+    
+    /**
      * GET  /alberos/sorted-by-last-update  get all the alberos.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of alberos in body
