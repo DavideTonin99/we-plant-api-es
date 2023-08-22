@@ -2,6 +2,7 @@ package cloud.nino.nino.web.rest.custom;
 
 import cloud.nino.nino.service.custom.AlberoCustomService;
 import cloud.nino.nino.service.dto.AlberoDTO;
+import cloud.nino.nino.service.dto.UserDTO;
 import cloud.nino.nino.service.dto.EssenzaDTO;
 import cloud.nino.nino.service.dto.custom.AlberoCustomDTO;
 import cloud.nino.nino.service.dto.custom.AlberoUserOperations;
@@ -236,6 +237,19 @@ public class AlberoCustomResource {
         log.debug("REST request to get Albero by id pianta: {}", idPianta);
         Optional<AlberoCustomDTO> alberoDTO = alberoCustomService.findByIdPianta(idPianta);
         return ResponseUtil.wrapOrNotFound(alberoDTO);
+    }
+
+    /**
+     * GET  /alberos/:id : get the "id" albero.
+     *
+     * @param idPianta the id of the alberoDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the alberoDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/alberos/users-by-id-pianta/{idPianta}")
+    @Timed
+    public List<UserDTO> getUsersByIdPianta(@PathVariable Integer idPianta) {
+        log.debug("REST request to get all Users");
+        return alberoCustomService.findAllUsersByIdPianta(idPianta);
     }
 
 

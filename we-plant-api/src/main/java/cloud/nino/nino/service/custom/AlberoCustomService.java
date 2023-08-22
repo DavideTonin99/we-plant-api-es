@@ -4,6 +4,7 @@ import cloud.nino.nino.domain.Albero;
 import cloud.nino.nino.domain.Essenza;
 import cloud.nino.nino.domain.EssenzaAudit;
 import cloud.nino.nino.domain.User;
+import cloud.nino.nino.service.dto.UserDTO;
 import cloud.nino.nino.repository.EssenzaRepository;
 import cloud.nino.nino.repository.UserRepository;
 import cloud.nino.nino.repository.custom.AlberoCustomRepository;
@@ -108,6 +109,20 @@ public class AlberoCustomService {
     }
 
     /**
+     * Get all users that modified a specific albero.
+     *
+     * @param idPianta the id of the albero we want to get users of
+     * @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<UserDTO> findAllUsersByIdPianta(long idPianta) {
+        log.debug("Request to get all Users that modified a pianta");
+        return alberoCustomRepository.findAllUsersByIdPianta(idPianta).stream()
+            .map(this::UserToUserDTO)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    /**
      * Get all the alberos sorted by last update.
      *
      * @param pageable
@@ -142,6 +157,10 @@ public class AlberoCustomService {
     public long getTotalNumberTrees() {
     	long totalNumber = alberoCustomRepository.getTotalNumberTrees();
         return totalNumber;
+    }
+
+    private UserDTO UserToUserDTO (User user) {
+        return new UserDTO(user);
     }
 
 
