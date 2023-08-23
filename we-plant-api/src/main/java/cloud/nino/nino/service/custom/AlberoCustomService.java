@@ -7,6 +7,7 @@ import cloud.nino.nino.domain.User;
 import cloud.nino.nino.service.dto.UserDTO;
 import cloud.nino.nino.repository.EssenzaRepository;
 import cloud.nino.nino.repository.UserRepository;
+import cloud.nino.nino.repository.custom.UserCustomRepository;
 import cloud.nino.nino.repository.custom.AlberoCustomRepository;
 import cloud.nino.nino.repository.custom.EssenzaAuditCustomRepository;
 import cloud.nino.nino.repository.custom.ImageCustomRepository;
@@ -39,6 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import java.math.BigInteger;
 /**
  * Service Implementation for managing Albero.
  */
@@ -56,6 +58,8 @@ public class AlberoCustomService {
 
     private final EssenzaAuditMapper essenzaAuditMapper;
 
+    private final UserCustomRepository userCustomRepository;
+
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
@@ -68,12 +72,13 @@ public class AlberoCustomService {
 
     private final ImageMapper imageMapper;
 
-    public AlberoCustomService(AlberoCustomRepository alberoCustomRepository, AlberoMapper alberoMapper, EssenzaMapper essenzaMapper, EssenzaAuditMapper essenzaAuditMapper, UserRepository userRepository, UserMapper userMapper, EssenzaAuditCustomRepository essenzaAuditCustomRepository, EssenzaRepository essenzaRepository, ImageCustomRepository imageCustomRepository, ImageMapper imageMapper) {
+    public AlberoCustomService(AlberoCustomRepository alberoCustomRepository, AlberoMapper alberoMapper, EssenzaMapper essenzaMapper, EssenzaAuditMapper essenzaAuditMapper, UserRepository userRepository,UserCustomRepository userCustomRepository, UserMapper userMapper, EssenzaAuditCustomRepository essenzaAuditCustomRepository, EssenzaRepository essenzaRepository, ImageCustomRepository imageCustomRepository, ImageMapper imageMapper) {
         this.alberoCustomRepository = alberoCustomRepository;
         this.alberoMapper = alberoMapper;
         this.essenzaMapper = essenzaMapper;
         this.essenzaAuditMapper = essenzaAuditMapper;
         this.userRepository = userRepository;
+        this.userCustomRepository = userCustomRepository;
         this.userMapper = userMapper;
         this.essenzaAuditCustomRepository = essenzaAuditCustomRepository;
         this.essenzaRepository = essenzaRepository;
@@ -116,10 +121,13 @@ public class AlberoCustomService {
      */
     @Transactional(readOnly = true)
     public List<UserDTO> findAllUsersByIdPianta(long idPianta) {
+        List<UserDTO> userDTOS = new LinkedList<>();
         log.debug("Request to get all Users that modified a pianta");
-        return alberoCustomRepository.findAllUsersByIdPianta(idPianta).stream()
-            .map(this::UserToUserDTO)
-            .collect(Collectors.toCollection(LinkedList::new));
+        this.alberoCustomRepository.findAllUsersByIdPianta(idPianta).stream().forEach(bigInt -> {
+            Optional<User> user = userCustomRepository.findUserById(bigInt);
+            userDTOS.add(userMapper.userToUserDTO(user.get()));
+        });
+        return userDTOS;
     }
 
     /**
@@ -146,10 +154,6 @@ public class AlberoCustomService {
             return alberoCustomDTO.get();
         }
 
-    }
-
-    private UserDTO UserToUserDTO (User user) {
-        return new UserDTO(user);
     }
 
 
