@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class AlberoCustomResourceIntTest {
 
 
-    private AlberoCustomService alberoCustomService = new AlberoCustomService(null, null, null, null, null, null, null, null, null, null);
+    private AlberoCustomService alberoCustomService = new AlberoCustomService(null, null, null, null, null, null, null, null, null, null, null);
 
     @Test
     public void testWktToLatLon() {
