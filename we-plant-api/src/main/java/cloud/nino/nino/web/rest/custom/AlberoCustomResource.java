@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import java.math.BigInteger;
+
 /**
  * REST controller for managing Albero.
  */
