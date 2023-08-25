@@ -121,7 +121,7 @@ public class AlberoCustomResource {
     @Timed
     public List<AlberoCustomDTO> getAllAlberosSortedByLastUpdate(Pageable pageable) {
         log.debug("REST request to get all Alberos sorted by last update");
-        return alberoCustomService.findAllAlberosSorted(pageable);
+        return alberoCustomService.findAllAlberosSorted(null);
     }
 
     /**
