@@ -57,6 +57,6 @@ public interface AlberoCustomRepository extends JpaRepository<Albero, Long> {
     @Query(value = "SELECT id, entityid, id_pianta, codice_area, nome_comune, classe_altezza, altezza, diametro_fusto, diametro, wkt, aggiornamento, nota, tipo_di_suolo, data_impianto, data_abbattimento, ( SELECT max(b.data_ultimo_aggiornamento) AS data_ultimo_aggiornamento FROM Albero b WHERE b.main_id = a.main_id ), data_prima_rilevazione, note_tecniche, posizione, deleted, essenza_id, modificato_da_id, main_id FROM Albero a WHERE a.main_id = a.id ORDER BY a.data_ultimo_aggiornamento desc", nativeQuery = true)
     List<Albero> findAllAlberosSortedByLastUpdate(Pageable pageable);
     
-    @Query(value = "SELECT DISTINCT modificato_da_id FROM Albero WHERE id_pianta = ?1", nativeQuery = true)
+    @Query(value = "SELECT modificato_da_id FROM Albero WHERE id_pianta = ?1", nativeQuery = true)
     List<BigInteger> findAllUsersByIdPianta(Long idPianta);
 }
