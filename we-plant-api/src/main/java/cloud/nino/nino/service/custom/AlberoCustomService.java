@@ -4,8 +4,10 @@ import cloud.nino.nino.domain.Albero;
 import cloud.nino.nino.domain.Essenza;
 import cloud.nino.nino.domain.EssenzaAudit;
 import cloud.nino.nino.domain.User;
+import cloud.nino.nino.service.dto.UserDTO;
 import cloud.nino.nino.repository.EssenzaRepository;
 import cloud.nino.nino.repository.UserRepository;
+import cloud.nino.nino.repository.custom.UserCustomRepository;
 import cloud.nino.nino.repository.custom.AlberoCustomRepository;
 import cloud.nino.nino.repository.custom.EssenzaAuditCustomRepository;
 import cloud.nino.nino.repository.custom.ImageCustomRepository;
@@ -38,6 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import java.math.BigInteger;
 /**
  * Service Implementation for managing Albero.
  */
@@ -55,6 +58,8 @@ public class AlberoCustomService {
 
     private final EssenzaAuditMapper essenzaAuditMapper;
 
+    private final UserCustomRepository userCustomRepository;
+
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
@@ -67,12 +72,13 @@ public class AlberoCustomService {
 
     private final ImageMapper imageMapper;
 
-    public AlberoCustomService(AlberoCustomRepository alberoCustomRepository, AlberoMapper alberoMapper, EssenzaMapper essenzaMapper, EssenzaAuditMapper essenzaAuditMapper, UserRepository userRepository, UserMapper userMapper, EssenzaAuditCustomRepository essenzaAuditCustomRepository, EssenzaRepository essenzaRepository, ImageCustomRepository imageCustomRepository, ImageMapper imageMapper) {
+    public AlberoCustomService(AlberoCustomRepository alberoCustomRepository, AlberoMapper alberoMapper, EssenzaMapper essenzaMapper, EssenzaAuditMapper essenzaAuditMapper, UserRepository userRepository,UserCustomRepository userCustomRepository, UserMapper userMapper, EssenzaAuditCustomRepository essenzaAuditCustomRepository, EssenzaRepository essenzaRepository, ImageCustomRepository imageCustomRepository, ImageMapper imageMapper) {
         this.alberoCustomRepository = alberoCustomRepository;
         this.alberoMapper = alberoMapper;
         this.essenzaMapper = essenzaMapper;
         this.essenzaAuditMapper = essenzaAuditMapper;
         this.userRepository = userRepository;
+        this.userCustomRepository = userCustomRepository;
         this.userMapper = userMapper;
         this.essenzaAuditCustomRepository = essenzaAuditCustomRepository;
         this.essenzaRepository = essenzaRepository;
@@ -107,6 +113,38 @@ public class AlberoCustomService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    /**
+     * Get all users that modified a specific albero.
+     *
+     * @param idPianta the id of the albero we want to get users of
+     * @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<UserDTO> findAllUsersByIdPianta(long idPianta) {
+        List<UserDTO> userDTOS = new LinkedList<>();
+        log.debug("Request to get all Users that modified a pianta");
+        this.alberoCustomRepository.findAllUsersByIdPianta(idPianta).stream().forEach(bigInt -> {
+            Optional<User> user = userCustomRepository.findUserById(bigInt);
+            userDTOS.add(userMapper.userToUserDTO(user.get()));
+        });
+        return userDTOS;
+    }
+
+    /**
+     * Get all the alberos sorted by last update.
+     *
+     * @param pageable
+     * @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<AlberoCustomDTO> findAllAlberosSorted(Pageable pageable) {
+        log.debug("Request to get all Alberos sorted by Last Update");
+        return alberoCustomRepository.findAllAlberosSortedByLastUpdate(pageable).stream()
+            .map(this::findAlbero)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+
 
     private AlberoCustomDTO findAlbero(Albero albero) {
         Optional<AlberoCustomDTO> alberoCustomDTO = alberoCustomRepository.findFirstByMainIdOrderByDataUltimoAggiornamentoDesc(albero.getMain().getId()).map(this::getAlberCustomDto);
@@ -116,6 +154,17 @@ public class AlberoCustomService {
             return alberoCustomDTO.get();
         }
 
+    }
+    
+    /**
+     * Get total number of trees in DB.
+     *
+     * @param 
+     * @return number of trees.
+     */
+    public long getTotalNumberTrees() {
+    	long totalNumber = alberoCustomRepository.getTotalNumberTrees();
+        return totalNumber;
     }
 
 

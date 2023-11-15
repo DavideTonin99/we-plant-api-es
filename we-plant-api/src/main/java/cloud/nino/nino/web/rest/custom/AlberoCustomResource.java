@@ -2,6 +2,7 @@ package cloud.nino.nino.web.rest.custom;
 
 import cloud.nino.nino.service.custom.AlberoCustomService;
 import cloud.nino.nino.service.dto.AlberoDTO;
+import cloud.nino.nino.service.dto.UserDTO;
 import cloud.nino.nino.service.dto.EssenzaDTO;
 import cloud.nino.nino.service.dto.custom.AlberoCustomDTO;
 import cloud.nino.nino.service.dto.custom.AlberoUserOperations;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import java.math.BigInteger;
 
 /**
  * REST controller for managing Albero.
@@ -96,7 +99,30 @@ public class AlberoCustomResource {
         log.debug("REST request to get all Alberos");
         return alberoCustomService.findAll(pageable);
     }
-
+    
+    /**
+     * GET  /alberos/total-number  get total number of trees in DB.
+     *
+     * @return the ResponseEntity with status 200 (OK) and a long representing the total number of trees
+     */
+    @GetMapping("/alberos/total-number")
+    @Timed
+    public long getTotalNumberOfTrees() {
+        log.debug("REST request to get total number of Alberos");
+        return alberoCustomService.getTotalNumberTrees();
+    }
+    
+    /**
+     * GET  /alberos/sorted-by-last-update  get all the alberos.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of alberos in body
+     */
+    @GetMapping("/alberos/sorted-by-last-update")
+    @Timed
+    public List<AlberoCustomDTO> getAllAlberosSortedByLastUpdate(Pageable pageable) {
+        log.debug("REST request to get all Alberos sorted by last update");
+        return alberoCustomService.findAllAlberosSorted(null);
+    }
 
     /**
      * GET  /alberos/export-history/:mainId : get the "id" alberoVisit.
@@ -213,6 +239,19 @@ public class AlberoCustomResource {
         log.debug("REST request to get Albero by id pianta: {}", idPianta);
         Optional<AlberoCustomDTO> alberoDTO = alberoCustomService.findByIdPianta(idPianta);
         return ResponseUtil.wrapOrNotFound(alberoDTO);
+    }
+
+    /**
+     * GET  /alberos/:id : get the "id" albero.
+     *
+     * @param idPianta the id of the alberoDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the alberoDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/alberos/users-by-id-pianta/{idPianta}")
+    @Timed
+    public List<UserDTO> getUsersByIdPianta(@PathVariable Integer idPianta) {
+        log.debug("REST request to get all Users");
+        return alberoCustomService.findAllUsersByIdPianta(idPianta);
     }
 
 
